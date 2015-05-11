@@ -128,6 +128,34 @@ object Generator {
     stepHarm
   }
 
+  def showTone(t: Tone): String = {
+    val s = t.toString
+    val i = s.indexOf("(")
+    s.substring(0, i)
+  }
+
+  def showSol(sol: Harm): Unit = {
+    val Harm(h, rr, rc, m, _) = sol
+    val chords = h.collectWords
+    val cells = rc.collectWords
+    val tones = m.collectWords
+
+    val chordsPerTone = chords zip cells flatMap {
+      case (c, rc) =>
+        Some(c) ::
+        rc.durations.tail.map { _ => None }
+    }
+
+    tones zip chordsPerTone foreach {
+      case (tone, Some(chord)) =>
+        println()
+        print("Triad(" + showTone(chord.fun) + ") " + showTone(tone))
+      case (tone, None) =>
+        print(" " + showTone(tone))
+    }
+    println()
+  }
+
   def solToSegment(sol: Harm): Sequential = {
     val Harm(h, rr, rc, m, _) = sol
     val roots = rr.collectWords
